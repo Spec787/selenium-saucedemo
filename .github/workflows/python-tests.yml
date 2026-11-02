@@ -1,0 +1,31 @@
+name: Selenium Tests
+
+on: [push, pull_request]  # Se activa al subir código o crear un PR
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Linux en la nube
+
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ejecutar pruebas en modo Headless
+        run: python -m pytest test_tienda.py --html=reporte_final.html --self-contained-html
+
+      - name: Guardar el Reporte HTML como evidencia
+        if: always()  # Se ejecuta aunque fallen las pruebas
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-selenium
+          path: reporte_final.html
